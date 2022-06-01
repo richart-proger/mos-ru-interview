@@ -39,7 +39,16 @@ class MainTasks {
      * <li>если параметр <b>не делится</b> нацело на 3 или на 5 - значение парамера в строковом виде
      */
     static String fizzBuzz(int i) {
-        return "";
+        if (i % 3 == 0 & i % 5 != 0)         {
+            return "Fizz";
+        }
+        if (i % 5 == 0 & i % 3 != 0) {
+          return "Buzz";
+        }
+        if (i % 3 == 0 & i % 5 == 0) {
+            return "FizzBuzz";
+        }
+        return Integer.toString(i);
     }
 
     /**
@@ -50,7 +59,13 @@ class MainTasks {
      * Список должен заканчиваться точкой.
      */
     static String withComma(List<City> cities) {
-        return "";
+        if (cities.isEmpty()){
+            return "";
+        }
+        return cities.stream()
+            .map(City::getName)
+            .collect(Collectors.joining(", "))
+            .concat(".");
     }
 
     /**
@@ -62,6 +77,7 @@ class MainTasks {
      * @param allCities список городов ({@link City}
      */
     static void notStartingWithMList(List<City> allCities) {
+        allCities.removeIf(city -> city.getName().startsWith("М"));
     }
 
     /**
@@ -77,7 +93,11 @@ class MainTasks {
      * @return long суммарное население для указанных городов
      */
     static long getSumPopulationFor(Stream<Country> countryStream, int populationThreshold) {
-        return 0;
+        return countryStream
+            .flatMap(country -> country.getCities().stream())
+            .filter(city -> city.getPopulation() > populationThreshold)
+            .mapToLong(City::getPopulation)
+            .sum();
     }
 
     /**
@@ -94,6 +114,10 @@ class MainTasks {
      * @param amount     сумма перевода. Для учебных целей -  int
      */
     static void doTransfer(int fromClient, int toClient, int amount) {
+        synchronized (accounts) {
+            setBalance(fromClient, accounts.get(fromClient) - amount);
+            setBalance(toClient, accounts.get(toClient) + amount);
+        }
     }
 
     /**
@@ -141,6 +165,11 @@ class MainTasks {
         6   3               Разработчик3            150000
         7   3               ТимЛид                  190000
         */
-        return "";
+        return "SELECT D.NAME, E.SUMSALARY\n"
+            + "FROM DEPARTMENT AS D\n"
+            + "       JOIN (SELECT E.DEPARTMENT, SUM(SALARY) AS SUMSALARY\n"
+            + "             FROM EMPLOYEE AS E\n"
+            + "             GROUP BY E.DEPARTMENT) AS E ON E.DEPARTMENT = D.ID\n"
+            + "WHERE E.SUMSALARY < 250000;";
     }
 }
